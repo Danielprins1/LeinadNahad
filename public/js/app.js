@@ -109,6 +109,35 @@
     });
   }
 
+  // Eigen bevestigingsvenster i.p.v. window.confirm: dat wordt door sommige (in-app)
+  // browsers geblokkeerd of na een paar keer stilletjes uitgeschakeld.
+  let sluitDialoog = null;
+  function bevestig(tekst, jaTekst = 'Ja, doorgaan') {
+    if (sluitDialoog) sluitDialoog(false);
+    return new Promise((resolve) => {
+      const klaar = (antwoord) => {
+        laag.remove();
+        sluitDialoog = null;
+        resolve(antwoord);
+      };
+      const ja = h('button', { class: 'knop', type: 'button', onclick: () => klaar(true) }, jaTekst);
+      const laag = h(
+        'div',
+        { class: 'dialoog', role: 'dialog', 'aria-modal': 'true', onclick: (e) => e.target === laag && klaar(false) },
+        h(
+          'div',
+          { class: 'kaart kader knoppen' },
+          h('p', { class: 'dialoog-tekst' }, tekst),
+          ja,
+          h('button', { class: 'knop tweede', type: 'button', onclick: () => klaar(false) }, 'Annuleren')
+        )
+      );
+      sluitDialoog = klaar;
+      document.body.append(laag);
+      ja.focus();
+    });
+  }
+
   // Voert een actie uit met een knop die tijdens het versturen geblokkeerd is.
   async function actie(knop, type, extra = {}, bezigTekst, { stil = false } = {}) {
     if (knop && knop.disabled) return { ok: false };
@@ -329,6 +358,7 @@
     huidigeSleutel = sleutel;
     regios = [];
     lokaal = {};
+    if (sluitDialoog) sluitDialoog(false);
     app.classList.toggle('breed', breed);
     app.replaceChildren(bouw());
     if (nieuweVraag) window.scrollTo({ top: 0 });
@@ -688,8 +718,9 @@
         {
           class: 'link',
           onclick: async (e) => {
-            if (!confirm('Weet je zeker dat je het spel wilt verlaten?')) return;
-            const res = await actie(e.currentTarget, 'leave');
+            const knop = e.currentTarget;
+            if (!(await bevestig('Weet je zeker dat je het spel wilt verlaten?', 'Ja, verlaten'))) return;
+            const res = await actie(knop, 'leave');
             if (res.ok) {
               opslag.wis();
               sessie = null;
@@ -994,8 +1025,11 @@
             'button',
             {
               class: 'knop',
-              onclick: (e) => {
-                if (confirm('Nieuw spel starten met dezelfde spelers? Alle scores gaan terug naar nul.')) actie(e.currentTarget, 'newGame', {}, 'Bezig…');
+              onclick: async (e) => {
+                const knop = e.currentTarget;
+                const stap = view.step;
+                if (await bevestig('Nieuw spel starten met dezelfde spelers? Alle scores gaan terug naar nul.', 'Ja, nieuw spel'))
+                  actie(knop, 'newGame', { step: stap }, 'Bezig…');
               },
             },
             'Nieuw spel met dezelfde spelers'
@@ -1058,8 +1092,11 @@
                       {
                         class: 'knop tweede klein',
                         'aria-label': `Verwijder ${p.name}`,
-                        onclick: (e) => {
-                          if (confirm(`${p.name} uit het spel verwijderen?`)) actie(e.currentTarget, 'kick', { playerId: p.id });
+                        onclick: async (e) => {
+                          const knop = e.currentTarget;
+                          const stap = view.step;
+                          if (await bevestig(`${p.name} uit het spel verwijderen?`, 'Ja, verwijderen'))
+                            actie(knop, 'kick', { playerId: p.id, step: stap });
                         },
                       },
                       'Verwijderen'
@@ -1097,10 +1134,12 @@
             {
               class: 'knop',
               disabled: v.players.length < v.minPlayers,
-              onclick: (e) => {
-                const offline = v.players.filter((p) => !p.connected).length;
-                if (offline && !confirm(`${offline} speler(s) zijn niet verbonden. Toch starten?`)) return;
-                actie(e.currentTarget, 'start', {}, 'Bezig…');
+              onclick: async (e) => {
+                const knop = e.currentTarget;
+                const stap = view.step;
+                const offline = view.players.filter((p) => !p.connected).length;
+                if (offline && !(await bevestig(`${offline} speler(s) zijn niet verbonden. Toch starten?`, 'Toch starten'))) return;
+                actie(knop, 'start', { step: stap }, 'Bezig…');
               },
             },
             v.players.length ? `Spel starten (${v.players.length} ${v.players.length === 1 ? 'speler' : 'spelers'})` : 'Wachten op spelers…'
@@ -1123,10 +1162,12 @@
             'button',
             {
               class: 'knop',
-              onclick: (e) => {
+              onclick: async (e) => {
+                const knop = e.currentTarget;
+                const stap = view.step;
                 const n = view.players.filter((x) => x.answered).length;
-                if (!confirm(`Antwoordfase afsluiten? Alleen de ${n} ingestuurde antwoorden doen mee.`)) return;
-                actie(e.currentTarget, 'closeAnswers', {}, 'Bezig…');
+                if (!(await bevestig(`Antwoordfase afsluiten? Alleen de ${n} ingestuurde antwoorden doen mee.`, 'Ja, afsluiten'))) return;
+                actie(knop, 'closeAnswers', { step: stap }, 'Bezig…');
               },
             },
             'Antwoordfase afsluiten'
@@ -1154,10 +1195,12 @@
           'button',
           {
             class: 'knop',
-            onclick: (e) => {
+            onclick: async (e) => {
+              const knop = e.currentTarget;
+              const stap = view.step;
               const open = view.players.filter((x) => x.canVote && !x.voted).length;
-              if (open && !confirm(`${open} speler(s) hebben nog niet gestemd. Stemfase toch afsluiten?`)) return;
-              actie(e.currentTarget, 'closeVotes', {}, 'Bezig…');
+              if (open && !(await bevestig(`${open} speler(s) hebben nog niet gestemd. Stemfase toch afsluiten?`, 'Ja, afsluiten'))) return;
+              actie(knop, 'closeVotes', { step: stap }, 'Bezig…');
             },
           },
           'Stemfase afsluiten'
@@ -1215,10 +1258,13 @@
             'button',
             {
               class: 'knop',
-              onclick: (e) => {
-                const aantal = lokaal.selectie.size;
-                if (!aantal && !confirm('Er is niemand geselecteerd. Niemand krijgt punten. Doorgaan?')) return;
-                actie(e.currentTarget, 'confirmPoints', { selection: [...lokaal.selectie] }, 'Punten worden toegekend…').then((res) => {
+              onclick: async (e) => {
+                const knop = e.currentTarget;
+                const stap = view.step;
+                const selectie = [...lokaal.selectie];
+                const aantal = selectie.length;
+                if (!aantal && !(await bevestig('Er is niemand geselecteerd, dus niemand krijgt punten. Doorgaan?', 'Ja, geen punten'))) return;
+                actie(knop, 'confirmPoints', { selection: selectie, step: stap }, 'Punten worden toegekend…').then((res) => {
                   if (res.ok) {
                     melding('Punten toegekend!', 'goed');
                     if (aantal) confetti.stoot({ aantal: 60 + aantal * 10 });

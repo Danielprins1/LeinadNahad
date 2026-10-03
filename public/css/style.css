@@ -923,7 +923,7 @@ textarea.invoer::placeholder {
 .meldingen {
   position: fixed;
   left: 50%;
-  bottom: calc(16px + env(safe-area-inset-bottom));
+  top: calc(12px + env(safe-area-inset-top));
   transform: translateX(-50%);
   width: min(92vw, 480px);
   display: flex;
@@ -1208,4 +1208,27 @@ textarea.invoer::placeholder {
 
 .banner.groot.lang .banner-tekst {
   font-size: clamp(1.3rem, 5.5vw, 2rem);
+}
+
+/* ---------- Bevestigingsvenster ---------- */
+.dialoog {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(16, 32, 44, 0.6);
+  animation: binnen 0.15s ease-out;
+}
+
+.dialoog .kaart {
+  width: min(100%, 420px);
+}
+
+.dialoog-tekst {
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 4px;
 }
