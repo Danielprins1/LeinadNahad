@@ -1,4 +1,4 @@
-# Leinad Nahad – het feestspel
+# The Ferbiël Games – Daniel 21 jaar
 
 Een mobiel multiplayer-feestspel in de browser, voor maximaal 16 spelers en één aparte host (spelleider).
 Er is geen installatie en er zijn geen accounts nodig. Spelers doen mee met hun naam en een spelcode van 4 letters.
