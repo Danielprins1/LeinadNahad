@@ -524,7 +524,7 @@
       h(
         'section',
         { class: 'scherm' },
-        h('div', { class: 'logo' }, banner('Het feestspel', 'Leinad Nahad', 'Voor maximaal 16 spelers', true)),
+        h('div', { class: 'logo' }, banner('Daniel 21 jaar', 'Leinad Nahad', null, true)),
         fout ? h('p', { class: 'fout' }, fout) : null,
         s
           ? h(
