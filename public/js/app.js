@@ -78,13 +78,6 @@
   let lokaal = {};
   let ooitVerbonden = false;
   let codeUitLinkGebruikt = false;
-  let laatsteMelding = (() => {
-    try {
-      return sessionStorage.getItem('feestspel-melding');
-    } catch {
-      return null;
-    }
-  })();
 
   const socket = io({ reconnectionDelay: 500, reconnectionDelayMax: 3000 });
 
@@ -133,6 +126,126 @@
       }
     }
     return res;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Confetti (eigen, lichte canvas-animatie; uit bij 'verminderde beweging')
+  // ---------------------------------------------------------------------------
+  const confetti = (() => {
+    const kleuren = ['#3b8fc4', '#24607f', '#f2c14e', '#ff6b8b', '#7cc8f0', '#2ec4a0', '#ffffff'];
+    const rustig = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let canvas = null;
+    let ctx = null;
+    let deeltjes = [];
+    let loopt = false;
+
+    function maat() {
+      const d = window.devicePixelRatio || 1;
+      canvas.width = innerWidth * d;
+      canvas.height = innerHeight * d;
+      ctx.setTransform(d, 0, 0, d, 0, 0);
+    }
+
+    function stoot({ aantal = 80, x = 0.5, y = 0.4, richting = -90, spreiding = 60, kracht = 12 } = {}) {
+      if (rustig) return;
+      if (!canvas) {
+        canvas = h('canvas', { class: 'confetti', 'aria-hidden': 'true' });
+        document.body.append(canvas);
+        ctx = canvas.getContext('2d');
+        maat();
+        addEventListener('resize', maat);
+      }
+      for (let i = 0; i < aantal && deeltjes.length < 600; i++) {
+        const hoek = ((richting + (Math.random() - 0.5) * spreiding * 2) * Math.PI) / 180;
+        const v = kracht * (0.45 + Math.random() * 0.75);
+        deeltjes.push({
+          x: x * innerWidth,
+          y: y * innerHeight,
+          vx: Math.cos(hoek) * v,
+          vy: Math.sin(hoek) * v,
+          hoek: Math.random() * Math.PI,
+          draai: (Math.random() - 0.5) * 0.35,
+          w: 6 + Math.random() * 6,
+          h: 4 + Math.random() * 5,
+          kleur: kleuren[Math.floor(Math.random() * kleuren.length)],
+          rond: Math.random() < 0.25,
+          leven: 0,
+          max: 150 + Math.random() * 90,
+        });
+      }
+      if (!loopt) {
+        loopt = true;
+        requestAnimationFrame(stap);
+      }
+    }
+
+    function stap() {
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      deeltjes = deeltjes.filter((d) => d.leven < d.max && d.y < innerHeight + 30);
+      for (const d of deeltjes) {
+        d.leven += 1;
+        d.vx *= 0.985;
+        d.vy = d.vy * 0.985 + 0.24;
+        d.x += d.vx + Math.sin(d.leven / 12) * 0.4;
+        d.y += d.vy;
+        d.hoek += d.draai;
+        ctx.save();
+        ctx.globalAlpha = Math.min(1, (d.max - d.leven) / 30);
+        ctx.translate(d.x, d.y);
+        ctx.rotate(d.hoek);
+        ctx.fillStyle = d.kleur;
+        if (d.rond) {
+          ctx.beginPath();
+          ctx.arc(0, 0, d.h / 2 + 1, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillRect(-d.w / 2, (-d.h / 2) * Math.abs(Math.cos(d.leven / 8)), d.w, d.h * Math.abs(Math.cos(d.leven / 8)) + 1);
+        }
+        ctx.restore();
+      }
+      if (deeltjes.length) requestAnimationFrame(stap);
+      else {
+        loopt = false;
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+      }
+    }
+
+    // Kleine knal vanaf een knop (bij insturen of stemmen).
+    function vanaf(el, aantal = 45) {
+      if (!el || !el.getBoundingClientRect) return stoot({ aantal });
+      const r = el.getBoundingClientRect();
+      stoot({ aantal, x: (r.left + r.width / 2) / innerWidth, y: (r.top + r.height / 2) / innerHeight, kracht: 10 });
+    }
+
+    function regen(ms = 2500) {
+      if (rustig) return;
+      const eind = Date.now() + ms;
+      (function tik() {
+        stoot({ aantal: 5, x: Math.random(), y: -0.03, richting: 90, spreiding: 25, kracht: 3 });
+        if (Date.now() < eind) setTimeout(tik, 90);
+      })();
+    }
+
+    function feest(ms = 3500) {
+      stoot({ aantal: 110, x: 0.1, y: 0.75, richting: -65, spreiding: 25, kracht: 17 });
+      stoot({ aantal: 110, x: 0.9, y: 0.75, richting: -115, spreiding: 25, kracht: 17 });
+      regen(ms);
+    }
+
+    return { stoot, vanaf, regen, feest };
+  })();
+
+  // Voorkomt dat confetti/meldingen opnieuw afgaan na verversen.
+  function eenmalig(sleutel) {
+    try {
+      const gezien = JSON.parse(sessionStorage.getItem('feestspel-gezien') || '[]');
+      if (gezien.includes(sleutel)) return false;
+      gezien.push(sleutel);
+      sessionStorage.setItem('feestspel-gezien', JSON.stringify(gezien.slice(-30)));
+    } catch {
+      /* zonder opslag: gewoon tonen */
+    }
+    return true;
   }
 
   // ---------------------------------------------------------------------------
@@ -233,19 +346,67 @@
   // ---------------------------------------------------------------------------
   const itemWoord = (v) => (v.roundType === 'stellingen' ? 'Stelling' : 'Vraag');
 
-  function voortgang(v) {
-    if (v.phase === 'intro') return h('div', { class: 'voortgang' }, `Ronde ${v.round} van ${v.totalRounds}`);
+  // Banner in Psych-stijl: categorie, voortgang en de vraag zelf.
+  function banner(label, tekst, sub, groot = false) {
     return h(
-      'div',
-      { class: 'voortgang' },
-      h('span', {}, `Ronde ${v.round} — ${itemWoord(v)} ${v.qIndex} van ${v.totalQ}`),
-      h('span', {}, v.roundTitle)
+      'header',
+      { class: `banner ${groot ? 'groot' : ''}` },
+      h('p', { class: 'banner-label' }, label),
+      tekst ? h('p', { class: 'banner-tekst' }, tekst) : null,
+      sub ? h('p', { class: 'banner-sub' }, sub) : null
     );
   }
 
-  function vraagKaart(v) {
-    const klasse = v.roundType === 'stellingen' ? 'stelling' : 'vraag';
-    return h('div', { class: 'kaart' }, h('p', { class: klasse }, v.question));
+  function kop(v) {
+    if (v.phase === 'intro') return banner(`Ronde ${v.round} van ${v.totalRounds}`, v.roundTitle, null, true);
+    return [
+      banner(v.roundTitle, v.question, `Ronde ${v.round} · ${itemWoord(v)} ${v.qIndex} van ${v.totalQ}`, v.roundType === 'stellingen'),
+      // groot tijdens het antwoorden, daarna als miniaturen
+      fotos(v.questionImages, v.phase !== 'answer'),
+    ];
+  }
+
+  // Foto's bij een vraag; tik om te vergroten.
+  function fotos(lijst, klein = false) {
+    if (!lijst || !lijst.length) return null;
+    return h(
+      'div',
+      { class: `fotos aantal-${Math.min(lijst.length, 3)} ${klein ? 'klein' : ''}` },
+      lijst.map((naam, i) =>
+        h(
+          'button',
+          { class: 'foto', type: 'button', 'aria-label': 'Foto vergroten', style: `--draai:${i % 2 ? 2.5 : -2.5}deg`, onclick: () => vergroot(`/fotos/${naam}`) },
+          h('img', {
+            src: `/fotos/${encodeURIComponent(naam)}`,
+            alt: 'Foto bij de vraag',
+            loading: 'eager',
+            decoding: 'async',
+            onerror: (e) => e.currentTarget.closest('.foto').remove(),
+          })
+        )
+      )
+    );
+  }
+
+  function vergroot(src) {
+    const laag = h(
+      'div',
+      { class: 'fotolaag', role: 'dialog', 'aria-label': 'Foto', onclick: () => laag.remove() },
+      h('img', { src, alt: 'Foto bij de vraag' }),
+      h('span', { class: 'sluit' }, 'Tik om te sluiten')
+    );
+    document.body.append(laag);
+  }
+
+  function sectie(tekst) {
+    return h('p', { class: 'sectie' }, tekst);
+  }
+
+  function avatar(naam) {
+    let x = 0;
+    for (const c of naam) x = (x * 31 + c.codePointAt(0)) >>> 0;
+    const letter = ([...naam.trim()][0] || '?').toLocaleUpperCase('nl-NL');
+    return h('span', { class: 'avatar', style: `--hue:${x % 360}`, 'aria-hidden': 'true' }, letter);
   }
 
   function wachten(tekst) {
@@ -260,26 +421,30 @@
     const spelers = gesorteerd(v.players);
     let plek = 0;
     let vorige = null;
+    const erbijIemand = v.awarded && Object.values(v.awarded).some(Boolean);
     return h(
       'div',
-      { class: 'kaart' },
-      h('h3', {}, titel),
+      { class: 'kaart scores' },
+      h('div', { class: 'scores-kop' }, titel),
+      erbijIemand ? h('p', { class: 'scores-sub' }, 'Punten erbij!') : null,
       h(
         'ol',
-        { class: 'lijst', style: 'margin-top:10px' },
+        { class: 'scorelijst' },
         spelers.map((p, i) => {
           if (p.total !== vorige) {
             plek = i + 1;
             vorige = p.total;
           }
           const erbij = v.awarded && v.awarded[p.id];
+          const ik = v.me && p.id === v.me.id;
           return h(
             'li',
-            { class: 'rij' },
-            h('span', { class: 'plek', style: 'font-weight:900;width:1.6em' }, `${plek}.`),
-            h('span', { class: 'naam' }, p.name, v.me && p.id === v.me.id ? ' (jij)' : ''),
-            erbij ? h('span', { class: 'badge' }, `+${erbij}`) : null,
-            h('span', { class: 'punten' }, `${p.total} pt`)
+            { class: `score-rij ${ik ? 'ik' : ''}`, style: `animation-delay:${Math.min(i, 12) * 40}ms` },
+            h('span', { class: 'plek' }, plek),
+            avatar(p.name),
+            h('span', { class: 'naam' }, p.name, ik ? ' (jij)' : ''),
+            erbij ? h('span', { class: 'erbij' }, `+${erbij}`) : null,
+            h('span', { class: 'totaal' }, p.total)
           );
         })
       )
@@ -359,13 +524,7 @@
       h(
         'section',
         { class: 'scherm' },
-        h(
-          'div',
-          { class: 'logo' },
-          h('span', { class: 'emoji', 'aria-hidden': 'true' }, '🎉'),
-          h('h1', {}, 'Leinad Nahad'),
-          h('p', { class: 'zacht' }, 'Het feestspel voor maximaal 16 spelers')
-        ),
+        h('div', { class: 'logo' }, banner('Het feestspel', 'Leinad Nahad', 'Voor maximaal 16 spelers', true)),
         fout ? h('p', { class: 'fout' }, fout) : null,
         s
           ? h(
@@ -444,7 +603,7 @@
     const form = h(
       'form',
       {
-        class: 'kaart knoppen',
+        class: 'kaart knoppen kader',
         onsubmit: async (e) => {
           e.preventDefault();
           foutVak.hidden = true;
@@ -478,7 +637,7 @@
       h(
         'section',
         { class: 'scherm' },
-        h('div', { class: 'logo', style: 'padding-top:2vh' }, h('h1', {}, 'Deelnemen')),
+        banner('Doe mee', 'Deelnemen', 'Vul de spelcode en je naam in'),
         form,
         h('button', { class: 'link', onclick: () => { history.replaceState(null, '', '/'); startScherm(); } }, '← Terug')
       )
@@ -506,16 +665,10 @@
     return h(
       'section',
       { class: 'scherm' },
-      h('h1', {}, 'Wachtkamer'),
-      h(
-        'div',
-        { class: 'kaart' },
-        h('p', { class: 'zacht' }, 'Spelcode'),
-        h('p', { style: 'font-size:2rem;font-weight:900;letter-spacing:.15em' }, v.code),
-        h('p', {}, 'Je doet mee als ', h('strong', {}, v.me.name))
-      ),
+      banner('Wachtkamer', v.code, null, true),
+      h('div', { class: 'kaart kader midden' }, h('p', {}, 'Je doet mee als'), h('p', { class: 'ik-naam' }, avatar(v.me.name), v.me.name)),
       live((v) => [
-        h('h3', { style: 'margin-bottom:10px' }, `Deelnemers (${v.players.length}/${v.maxPlayers})`),
+        sectie(`Deelnemers (${v.players.length}/${v.maxPlayers})`),
         h(
           'ul',
           { class: 'spelers' },
@@ -554,9 +707,8 @@
     return h(
       'section',
       { class: 'scherm' },
-      voortgang(v),
-      h('h1', {}, `Ronde ${v.round}: ${v.roundTitle}`),
-      h('div', { class: 'kaart' }, h('p', {}, v.roundUitleg)),
+      kop(v),
+      h('div', { class: 'kaart kader' }, h('p', { class: 'uitleg' }, v.roundUitleg)),
       isHost
         ? h('button', { class: 'knop', onclick: (e) => actie(e.currentTarget, 'next', {}, 'Bezig…') }, `Start ronde ${v.round}`)
         : wachten('De host start zo de ronde…'),
@@ -566,7 +718,7 @@
 
   function spelerAntwoord(v) {
     const kennis = v.roundType === 'kennis';
-    const deel = [voortgang(v), vraagKaart(v)];
+    const deel = [kop(v)];
     if (kennis) deel.push(aftelBlok(v));
 
     if (v.myAnswer !== null) {
@@ -605,7 +757,7 @@
       const form = h(
         'form',
         {
-          class: 'kaart knoppen',
+          class: 'kaart knoppen kader',
           onsubmit: async (e) => {
             e.preventDefault();
             const tekst = veld.value.trim();
@@ -615,10 +767,11 @@
               return;
             }
             veld.blur();
-            await actie(knop, 'answer', { text: tekst }, 'Versturen…');
+            const res = await actie(knop, 'answer', { text: tekst }, 'Versturen…');
+            if (res.ok) confetti.vanaf(knop, 40);
           },
         },
-        h('label', { for: 'antwoord', style: 'font-weight:700' }, 'Jouw antwoord'),
+        h('label', { for: 'antwoord', class: 'sectie' }, 'Jouw antwoord'),
         veld,
         teller,
         foutVak,
@@ -661,19 +814,20 @@
         },
         o.mine ? h('span', { class: 'label' }, 'Jouw antwoord') : null,
         o.id === v.myVote ? h('span', { class: 'label' }, 'Jouw stem ✓') : null,
-        o.text
+        h('span', { class: 'optie-tekst' }, '“', o.text, '”')
       );
       return knop;
     });
     stemKnop.addEventListener('click', () => {
-      if (lokaal.keuze) actie(stemKnop, 'vote', { optionId: lokaal.keuze }, 'Stem wordt verstuurd…');
+      if (lokaal.keuze)
+        actie(stemKnop, 'vote', { optionId: lokaal.keuze }, 'Stem wordt verstuurd…').then((res) => res.ok && confetti.vanaf(stemKnop, 40));
     });
 
-    const deel = [voortgang(v), h('div', { class: 'kaart compact' }, h('p', { style: 'font-weight:700' }, v.question))];
+    const deel = [kop(v)];
     if (!v.options.length) {
       deel.push(h('div', { class: 'kaart' }, h('p', {}, 'Er zijn geen antwoorden ingestuurd.')), wachten('Wachten op de host…'));
     } else {
-      deel.push(h('h2', {}, gestemd ? 'Je stem is uitgebracht!' : 'Stem op je favoriete antwoord'));
+      deel.push(sectie(gestemd ? 'Je stem is uitgebracht!' : 'Kies je favoriete antwoord'));
       if (!v.canVote) deel.push(h('div', { class: 'kaart compact' }, h('p', {}, 'Er is geen antwoord waarop jij kunt stemmen.')));
       deel.push(h('div', { class: 'opties' }, optieKnoppen));
       if (gestemd || !v.canVote) deel.push(wachten('Wachten tot iedereen heeft gestemd…'));
@@ -694,7 +848,7 @@
           h(
             'div',
             { class: 'boven' },
-            h('span', { class: 'auteur' }, a.name),
+            h('span', { class: 'auteur' }, avatar(a.name), a.name),
             metBeoordeling ? h('span', { class: `badge ${a.approved ? '' : 'nul'}` }, a.approved ? '✓ +3' : '0') : null
           ),
           a.text === null ? h('span', { class: 'tekst geen-antwoord' }, 'Geen antwoord') : h('span', { class: 'tekst' }, a.text)
@@ -707,9 +861,8 @@
     return h(
       'section',
       { class: 'scherm' },
-      voortgang(v),
-      vraagKaart(v),
-      h('div', { class: 'kaart' }, h('h3', { style: 'margin-bottom:10px' }, 'Alle antwoorden'), antwoordenLijst(v, false)),
+      kop(v),
+      h('div', { class: 'kaart' }, sectie('Alle antwoorden'), antwoordenLijst(v, false)),
       wachten('De host beoordeelt de antwoorden…')
     );
   }
@@ -718,8 +871,7 @@
     return h(
       'section',
       { class: 'scherm' },
-      voortgang(v),
-      vraagKaart(v),
+      kop(v),
       wachten('Speel de stelling samen. De host deelt daarna de punten uit.')
     );
   }
@@ -730,7 +882,7 @@
       return h(
         'div',
         { class: 'kaart' },
-        h('h3', { style: 'margin-bottom:10px' }, 'Uitslag'),
+        sectie('Uitslag'),
         h(
           'ul',
           { class: 'lijst' },
@@ -741,29 +893,29 @@
               h(
                 'div',
                 { class: 'boven' },
-                h('span', { class: 'tekst' }, r.text),
+                h('span', { class: 'tekst' }, '“', r.text, '”'),
                 h('span', { class: `badge ${r.votes ? '' : 'nul'}` }, `${r.votes} ${r.votes === 1 ? 'stem' : 'stemmen'}`)
               ),
-              h('span', { class: 'auteur' }, 'van ', r.authorName, r.mine ? ' (jij)' : '', r.votes ? ` · +${r.votes} pt` : '')
+              h('span', { class: 'auteur' }, avatar(r.authorName), r.authorName, r.mine ? ' (jij)' : '', r.votes ? ` · +${r.votes} pt` : '')
             )
           )
         )
       );
     }
     if (v.roundType === 'kennis') {
-      return h('div', { class: 'kaart' }, h('h3', { style: 'margin-bottom:10px' }, 'Beoordeling'), antwoordenLijst(v, true));
+      return h('div', { class: 'kaart' }, sectie('Beoordeling'), antwoordenLijst(v, true));
     }
     const winnaars = v.players.filter((p) => v.awarded && v.awarded[p.id]);
     return h(
       'div',
       { class: 'kaart' },
-      h('h3', { style: 'margin-bottom:10px' }, 'Punten voor deze stelling'),
+      sectie('Punten voor deze stelling'),
       winnaars.length
         ? h(
             'ul',
             { class: 'lijst' },
             winnaars.map((p) =>
-              h('li', { class: 'rij' }, h('span', { class: 'naam' }, p.name, v.me && p.id === v.me.id ? ' (jij)' : ''), h('span', { class: 'badge' }, `+${v.awarded[p.id]}`))
+              h('li', { class: 'rij' }, avatar(p.name), h('span', { class: 'naam' }, p.name, v.me && p.id === v.me.id ? ' (jij)' : ''), h('span', { class: 'badge' }, `+${v.awarded[p.id]}`))
             )
           )
         : h('p', {}, 'Niemand heeft punten gekregen bij deze stelling.')
@@ -772,21 +924,16 @@
 
   function spelerUitslag(v) {
     const mijnPunten = v.awarded && v.awarded[v.me.id];
-    const meldSleutel = `${v.code}:${v.gameNumber}:${v.step}`;
-    if (mijnPunten && laatsteMelding !== meldSleutel) {
-      laatsteMelding = meldSleutel;
-      try {
-        sessionStorage.setItem('feestspel-melding', meldSleutel);
-      } catch {
-        /* negeren */
-      }
-      setTimeout(() => melding(`🎉 Je kreeg +${mijnPunten} ${mijnPunten === 1 ? 'punt' : 'punten'}!`, 'goed'), 150);
+    if (mijnPunten && eenmalig(`punten:${v.code}:${v.gameNumber}:${v.step}`)) {
+      setTimeout(() => {
+        melding(`🎉 Je kreeg +${mijnPunten} ${mijnPunten === 1 ? 'punt' : 'punten'}!`, 'goed');
+        confetti.stoot({ aantal: Math.min(160, 50 + mijnPunten * 20), y: 0.35 });
+      }, 250);
     }
     return h(
       'section',
       { class: 'scherm' },
-      voortgang(v),
-      h('div', { class: 'kaart compact' }, h('p', { style: 'font-weight:700' }, v.question)),
+      kop(v),
       uitslagInhoud(v),
       live((v) => tussenstand(v)),
       wachten('Wachten op de host…')
@@ -795,10 +942,14 @@
 
   function eindScherm(v, isHost) {
     const winnaars = v.ranking.filter((r) => r.winner);
+    if (eenmalig(`einde:${v.code}:${v.gameNumber}`)) {
+      const ikWin = v.me && winnaars.some((w) => w.id === v.me.id);
+      setTimeout(() => confetti.feest(ikWin ? 6000 : 3500), 300);
+    }
     return h(
       'section',
       { class: 'scherm' },
-      h('h1', { class: 'midden' }, 'Einduitslag'),
+      banner('Einde van het spel', 'Einduitslag', null, true),
       winnaars.length
         ? h(
             'div',
@@ -820,6 +971,7 @@
               'li',
               { class: `rij ${r.winner ? 'winnaar-rij' : ''}` },
               h('span', { class: 'plek' }, r.winner ? '🏆' : `${r.rank}.`),
+              avatar(r.name),
               h('span', { class: 'naam' }, r.name, v.me && r.id === v.me.id ? ' (jij)' : ''),
               h('span', { class: 'punten' }, `${r.total} pt`),
               h(
@@ -877,7 +1029,7 @@
     return h(
       'div',
       { class: 'kaart' },
-      h('h3', { style: 'margin-bottom:10px' }, `Deelnemers (${v.players.length}/${v.maxPlayers})`),
+      sectie(`Deelnemers (${v.players.length}/${v.maxPlayers})`),
       lijst.length
         ? h(
             'ul',
@@ -954,10 +1106,9 @@
     if (p === 'intro') return introScherm(v, true);
     if (p === 'final') return eindScherm(v, true);
 
-    const deel = [voortgang(v)];
+    const deel = [kop(v)];
 
     if (p === 'answer') {
-      deel.push(vraagKaart(v));
       if (v.roundType === 'kennis') deel.push(aftelBlok(v));
       deel.push(live((v) => statusChips(v, 'answer'), 'div', { class: 'kaart' }));
       if (v.roundType === 'psych') {
@@ -981,13 +1132,12 @@
     }
 
     if (p === 'vote') {
-      deel.push(h('div', { class: 'kaart compact' }, h('p', { style: 'font-weight:700' }, v.question)));
       deel.push(live((v) => statusChips(v, 'vote'), 'div', { class: 'kaart' }));
       deel.push(
         h(
           'div',
           { class: 'kaart' },
-          h('h3', { style: 'margin-bottom:10px' }, `Antwoorden (${v.options.length}) — anoniem`),
+          sectie(`Antwoorden (${v.options.length}) — anoniem`),
           v.options.length
             ? h('ol', { class: 'opties twee-kolommen', style: 'padding:0;list-style:none' }, v.options.map((o) => h('li', { class: 'rij' }, o.text)))
             : h('p', {}, 'Er zijn geen antwoorden ingestuurd.')
@@ -1011,7 +1161,6 @@
 
     if (p === 'review' || p === 'statement') {
       const review = p === 'review';
-      deel.push(review ? h('div', { class: 'kaart compact' }, h('p', { class: 'vraag' }, v.question)) : vraagKaart(v));
       lokaal.selectie = new Set(v.selected || []);
       const samenvatting = h('p', { class: 'telling' });
       const werkSamenvattingBij = () => {
@@ -1053,7 +1202,7 @@
         h(
           'div',
           { class: 'kaart knoppen' },
-          h('h3', {}, review ? 'Vink de goede antwoorden aan (3 punten per goed antwoord)' : 'Wie krijgt er 3 punten?'),
+          sectie(review ? 'Vink de goede antwoorden aan · 3 punten per stuk' : 'Wie krijgt er 3 punten?'),
           h('div', { class: 'knoppen', style: 'gap:8px' }, keuzes),
           samenvatting,
           h(
@@ -1061,9 +1210,13 @@
             {
               class: 'knop',
               onclick: (e) => {
-                if (!lokaal.selectie.size && !confirm('Er is niemand geselecteerd. Niemand krijgt punten. Doorgaan?')) return;
+                const aantal = lokaal.selectie.size;
+                if (!aantal && !confirm('Er is niemand geselecteerd. Niemand krijgt punten. Doorgaan?')) return;
                 actie(e.currentTarget, 'confirmPoints', { selection: [...lokaal.selectie] }, 'Punten worden toegekend…').then((res) => {
-                  if (res.ok) melding('Punten toegekend!', 'goed');
+                  if (res.ok) {
+                    melding('Punten toegekend!', 'goed');
+                    if (aantal) confetti.stoot({ aantal: 60 + aantal * 10 });
+                  }
                 });
               },
             },
@@ -1074,7 +1227,6 @@
     }
 
     if (p === 'result') {
-      deel.push(h('div', { class: 'kaart compact' }, h('p', { style: 'font-weight:700' }, v.question)));
       deel.push(uitslagInhoud(v));
       deel.push(h('button', { class: 'knop', onclick: (e) => actie(e.currentTarget, 'next', {}, 'Bezig…') }, volgendeLabel(v)));
     }

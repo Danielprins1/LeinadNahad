@@ -63,7 +63,16 @@ function loadContent() {
   if (!Array.isArray(rondes) || rondes.length !== 3) fail('content/vragen.js moet precies drie rondes bevatten.');
   const override = Number(process.env.R2_SECONDS);
   return rondes.map((r, i) => {
-    const items = (r.vragen || r.stellingen || []).map((t) => String(t).trim()).filter(Boolean);
+    // Een vraag is een tekst, of { tekst, fotos: ['bestand.jpg'] } met foto's uit public/fotos/.
+    const items = (r.vragen || r.stellingen || [])
+      .map((t) => {
+        const item = t && typeof t === 'object' ? t : { tekst: t };
+        const images = (Array.isArray(item.fotos) ? item.fotos : [])
+          .map(String)
+          .filter((f) => /^[\w.-]+\.(jpe?g|png|webp|gif)$/i.test(f));
+        return { text: String(item.tekst ?? '').trim(), images };
+      })
+      .filter((item) => item.text);
     if (!items.length) fail(`Ronde ${i + 1} in content/vragen.js heeft geen vragen.`);
     return {
       type: ROUND_TYPES[i],
@@ -208,7 +217,8 @@ class GameStore {
   startQuestion(game) {
     const round = this.round(game);
     game.q = {
-      text: round.items[game.qIndex],
+      text: round.items[game.qIndex].text,
+      images: round.items[game.qIndex].images,
       answers: {},
       options: [],
       votes: {},
@@ -375,7 +385,10 @@ class GameStore {
       })),
     };
 
-    if (inQuestion) v.question = q.text;
+    if (inQuestion) {
+      v.question = q.text;
+      v.questionImages = q.images || [];
+    }
     if (q && q.awarded && phase === 'result') v.awarded = q.awarded;
 
     if (phase === 'answer') {

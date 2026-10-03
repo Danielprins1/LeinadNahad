@@ -28,7 +28,8 @@ content/vragen.js     ← ALLE VRAGEN EN STELLINGEN (hier pas je de inhoud aan)
 server/index.js       HTTP-server, Socket.IO, opslag op schijf, QR-code-endpoint
 server/game.js        Spellogica: fases, rechten, timer, punten, weergave per deelnemer
 public/index.html     De enige HTML-pagina
-public/css/style.css  Vormgeving (kleuren en lettertype als variabelen bovenaan)
+public/css/style.css  Vormgeving in Psych-stijl (kleuren en lettertypes als variabelen bovenaan)
+public/fotos/         Foto's bij vragen
 public/js/app.js      Alle schermen voor spelers en host
 test/                 Geautomatiseerde tests (met eigen testvragen in test/testvragen.js)
 Dockerfile, render.yaml  Hosting
@@ -40,6 +41,12 @@ Alle teksten staan in **`content/vragen.js`**. Pas de zinnen tussen de aanhaling
 de uitleg per ronde en de tijdslimiet van ronde 2 (`tijdslimietSeconden`) wijzigen. Aan de spellogica hoef je niets te veranderen.
 Een nieuw spel gebruikt automatisch de nieuwe teksten. Online moet je de wijziging wel opnieuw uitrollen (committen en pushen
 volstaat bij Render).
+
+### Foto's bij een vraag
+
+Zet de foto in `public/fotos/` en schrijf de vraag in `content/vragen.js` als
+`{ tekst: 'De vraag', fotos: ['naam.jpg'] }`. Vraag 1 van ronde 1 verwacht `isa-1.jpg` en `isa-2.jpg`.
+Ontbreekt een foto, dan wordt die gewoon niet getoond. Spelers kunnen op een foto tikken om hem te vergroten.
 
 ## Lokaal starten
 

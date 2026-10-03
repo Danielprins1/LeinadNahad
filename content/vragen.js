@@ -7,6 +7,8 @@
  *  - Iedere ronde heeft minimaal één vraag/stelling nodig; het aantal per ronde mag verschillen.
  *  - Zet iedere tekst tussen enkele aanhalingstekens en sluit af met een komma.
  *    Gebruik je zelf een apostrof in de tekst? Schrijf dan \' (bijv. 'Daniel\'s auto').
+ *  - Foto bij een vraag? Zet het bestand in public/fotos/ en schrijf de vraag als
+ *    { tekst: 'De vraag', fotos: ['naam.jpg'] }  (jpg, png, webp of gif).
  *  - Wijzigingen gelden voor ieder spel dat daarna wordt aangemaakt (of via
  *    'Nieuw spel' opnieuw begint). Een spel dat al loopt houdt zijn vragen.
  *    Draait de server online, dan moet je de wijziging wel opnieuw uitrollen.
@@ -19,8 +21,10 @@ module.exports = {
         'Schrijf het grappigste antwoord over Daniel. ' +
         'Daarna stemt iedereen op zijn favoriete antwoord. Iedere stem op jouw antwoord levert 1 punt op.',
       vragen: [
-        // Foto van Isa volgt in een latere versie.
-        'Daniel heeft Isa geil gemaakt door één zin te zeggen. Welke zin was dat?',
+        {
+          tekst: 'Daniel heeft Isa geil gemaakt door één zin te zeggen. Welke zin was dat?',
+          fotos: ['isa-1.jpg', 'isa-2.jpg'],
+        },
         'Waarom is Daniel te laat bij zijn sollicitatie, en hoe fixt hij de job?',
         'Daniel zit bij de EHBO. Wat is er gebeurd?',
         'Daniel gaat op vakantie. Wat zit er in zijn tas?',
