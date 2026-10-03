@@ -350,7 +350,7 @@
   function banner(label, tekst, sub, groot = false) {
     return h(
       'header',
-      { class: `banner ${groot ? 'groot' : ''}` },
+      { class: `banner ${groot ? 'groot' : ''} ${tekst && tekst.length > 110 ? 'lang' : ''}` },
       h('p', { class: 'banner-label' }, label),
       tekst ? h('p', { class: 'banner-tekst' }, tekst) : null,
       sub ? h('p', { class: 'banner-sub' }, sub) : null

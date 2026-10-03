@@ -1199,3 +1199,13 @@ textarea.invoer::placeholder {
 .fotos.klein .foto img {
   height: 96px;
 }
+
+/* Lange vragen compacter, zodat het antwoordveld sneller in beeld is */
+.banner.lang .banner-tekst {
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+
+.banner.groot.lang .banner-tekst {
+  font-size: clamp(1.3rem, 5.5vw, 2rem);
+}

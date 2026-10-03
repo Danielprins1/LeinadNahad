@@ -40,9 +40,13 @@ module.exports = {
       tijdslimietSeconden: 30,
       vragen: [
         'Wat is de lengte van Daniels hoofd?',
-        'Daniel is voorzitter bij de Joodse jeugdbeweging Haboniem. Op de algemene ledenvergadering voor de begeleiders ' +
-          'wordt besproken wanneer er gescholden mag worden in het bijzijn van de oudste kinderen. ' +
-          'Welk woord verdedigt Daniel, en waarom?',
+        {
+          tekst:
+            'Daniel is voorzitter bij de Joodse jeugdbeweging Haboniem. Op de algemene ledenvergadering voor de begeleiders ' +
+            'wordt besproken wanneer er gescholden mag worden in het bijzijn van de oudste kinderen. ' +
+            'Welk woord verdedigt Daniel, en waarom?',
+          fotos: ['daniel-haboniem.webp'],
+        },
         'Wat zei Daniel aan de telefoon toen hij werd gebeld met de vraag of hij al wakker was voor zijn vlucht?',
       ],
     },
