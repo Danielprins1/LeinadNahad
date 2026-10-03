@@ -31,11 +31,11 @@ module.exports = {
         },
         {
           tekst: 'Daniel zit bij de EHBO. Wat is er gebeurd?',
-          fotos: ['ehbo-vest.jpg'],
+          fotos: ['ehbo-vest.jpg', 'sprong-boot.jpg'],
         },
         {
           tekst: 'Daniel gaat op vakantie. Wat zit er in zijn tas?',
-          fotos: ['aubergine.jpg'],
+          fotos: ['aubergine.jpg', 'groepsreis.jpg'],
         },
         {
           tekst: 'Daniel ziet een vrouw. Wat doet hij?',
@@ -54,7 +54,10 @@ module.exports = {
         'De host beoordeelt de antwoorden. Ieder goed antwoord levert 3 punten op.',
       tijdslimietSeconden: 30,
       vragen: [
-        'Wat is de lengte van Daniels hoofd?',
+        {
+          tekst: 'Wat is de lengte van Daniels hoofd?',
+          fotos: ['hoofd-close-up.jpg'],
+        },
         {
           tekst:
             'Daniel is voorzitter bij de Joodse jeugdbeweging Haboniem. Op de algemene ledenvergadering voor de begeleiders ' +
@@ -74,7 +77,10 @@ module.exports = {
         'Lees de situatie voor en bespreek samen hoe Daniel heeft gehandeld. ' +
         'De host deelt per situatie 3 punten uit aan de spelers die het (bijna) goed hadden.',
       stellingen: [
-        'Daniel filmt zichzelf en er staat een Chinese vrouw (Meiling) achter hem. Wat gebeurt er daarna?',
+        {
+          tekst: 'Daniel filmt zichzelf en er staat een Chinese vrouw (Meiling) achter hem. Wat gebeurt er daarna?',
+          fotos: ['klas.jpg'],
+        },
         {
           tekst:
             'In een leegstaand kantoorgebouw gooit Daniel shit van het dak. Hij knipt een zware deur uit de scharnieren ' +
