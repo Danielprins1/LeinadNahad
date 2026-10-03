@@ -78,7 +78,8 @@ function loadContent() {
         const images = (Array.isArray(item.fotos) ? item.fotos : [])
           .map(String)
           .filter((f) => /^[\w.-]+\.(jpe?g|png|webp|gif)$/i.test(f));
-        return { text: String(item.tekst ?? '').trim(), images };
+        // uitbeelden: geen timer en geen invulvak; de host deelt de punten uit.
+        return { text: String(item.tekst ?? '').trim(), images, act: item.uitbeelden === true };
       })
       .filter((item) => item.text);
     if (!items.length) fail(`Ronde ${i + 1} in content/vragen.js heeft geen vragen.`);
@@ -227,6 +228,7 @@ class GameStore {
     game.q = {
       text: round.items[game.qIndex].text,
       images: round.items[game.qIndex].images,
+      act: !!round.items[game.qIndex].act,
       answers: {},
       options: [],
       votes: {},
@@ -234,7 +236,7 @@ class GameStore {
       selected: [],
       awarded: null,
     };
-    if (round.type === 'stellingen') {
+    if (round.type === 'stellingen' || game.q.act) {
       this.advance(game, 'statement');
     } else {
       if (round.type === 'kennis') game.q.deadline = this.now() + round.seconds * 1000;
@@ -396,6 +398,7 @@ class GameStore {
     if (inQuestion) {
       v.question = q.text;
       v.questionImages = q.images || [];
+      v.questionAct = !!q.act;
     }
     if (q && q.awarded && phase === 'result') v.awarded = q.awarded;
 
@@ -431,7 +434,7 @@ class GameStore {
       if (me) v.myVote = q.votes[me.id] ?? null;
     }
 
-    if ((phase === 'review' || phase === 'result') && round.type === 'kennis') {
+    if ((phase === 'review' || phase === 'result') && round.type === 'kennis' && !q.act) {
       v.answers = game.players.map((p) => ({
         playerId: p.id,
         name: p.name,

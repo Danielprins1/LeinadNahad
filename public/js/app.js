@@ -390,7 +390,12 @@
   function kop(v) {
     if (v.phase === 'intro') return banner(`Ronde ${v.round} van ${v.totalRounds}`, v.roundTitle, null, true);
     return [
-      banner(v.roundTitle, v.question, `Ronde ${v.round} · ${itemWoord(v)} ${v.qIndex} van ${v.totalQ}`, v.roundType === 'stellingen'),
+      banner(
+        v.questionAct ? `${v.roundTitle} · Uitbeelden` : v.roundTitle,
+        v.question,
+        `Ronde ${v.round} · ${itemWoord(v)} ${v.qIndex} van ${v.totalQ}`,
+        v.roundType === 'stellingen' || v.questionAct
+      ),
       // groot tijdens het antwoorden en bij situaties, daarna als miniaturen
       fotos(v.questionImages, !['answer', 'statement'].includes(v.phase)),
     ];
@@ -909,7 +914,11 @@
       'section',
       { class: 'scherm' },
       kop(v),
-      wachten('Speel de stelling samen. De host deelt daarna de punten uit.')
+      wachten(
+        v.questionAct
+          ? 'Uitbeelden! Je hoeft niets in te vullen. De host deelt daarna de punten uit.'
+          : 'Speel de stelling samen. De host deelt daarna de punten uit.'
+      )
     );
   }
 
@@ -939,14 +948,14 @@
         )
       );
     }
-    if (v.roundType === 'kennis') {
+    if (v.roundType === 'kennis' && v.answers) {
       return h('div', { class: 'kaart' }, sectie('Beoordeling'), antwoordenLijst(v, true));
     }
     const winnaars = v.players.filter((p) => v.awarded && v.awarded[p.id]);
     return h(
       'div',
       { class: 'kaart' },
-      sectie('Punten voor deze stelling'),
+      sectie(v.questionAct ? 'Punten voor het uitbeelden' : 'Punten voor deze stelling'),
       winnaars.length
         ? h(
             'ul',

@@ -9,6 +9,8 @@
  *    Gebruik je zelf een apostrof in de tekst? Schrijf dan \' (bijv. 'Daniel\'s auto').
  *  - Foto bij een vraag? Zet het bestand in public/fotos/ en schrijf de vraag als
  *    { tekst: 'De vraag', fotos: ['naam.jpg'] }  (jpg, png, webp of gif).
+ *  - Uitbeeldvraag (alleen ronde 2): geen timer en geen invulvak, de host deelt de punten uit.
+ *    Schrijf de vraag als  { tekst: 'De vraag', uitbeelden: true }.
  *  - Wijzigingen gelden voor ieder spel dat daarna wordt aangemaakt (of via
  *    'Nieuw spel' opnieuw begint). Een spel dat al loopt houdt zijn vragen.
  *    Draait de server online, dan moet je de wijziging wel opnieuw uitrollen.

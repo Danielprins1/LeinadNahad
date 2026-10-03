@@ -129,6 +129,33 @@ test('psych: hetzelfde antwoord als een ander wordt geweigerd, in ronde 2 mag he
   s.done();
 });
 
+test('uitbeeldvraag in ronde 2: geen timer, geen invoer, host deelt punten uit', () => {
+  const s = opzet(2);
+  s.game.content[1].items[0].act = true; // eerste kennisvraag wordt een uitbeeldvraag
+  s.host('start');
+  while (!(s.game.round === 1 && s.game.phase !== 'intro')) {
+    if (s.game.phase === 'answer') s.host('closeAnswers');
+    else if (s.game.phase === 'vote') s.host('closeVotes');
+    else s.host('next');
+  }
+  assert.equal(s.game.phase, 'statement');
+  assert.equal(s.game.q.deadline, null);
+  assert.equal(s.store.timers.has(s.code), false);
+  assert.throws(() => s.speler(0, 'answer', { text: 'x' }), /geen antwoord/);
+  const v = s.store.view(s.game, s.spelers[0]);
+  assert.equal(v.questionAct, true);
+  s.host('confirmPoints', { selection: [s.spelers[1].playerId] });
+  assert.equal(s.game.phase, 'result');
+  assert.deepEqual(s.game.players[1].scores, [0, 3, 0]);
+  const r = s.store.view(s.game, s.spelers[0]);
+  assert.equal(r.answers, undefined, 'geen antwoordenlijst bij uitbeelden');
+  // volgende kennisvraag heeft weer een timer
+  s.host('next');
+  assert.equal(s.game.phase, 'answer');
+  assert.ok(s.game.q.deadline);
+  s.done();
+});
+
 test('lange en rare invoer wordt opgeschoond', () => {
   const s = opzet(1);
   assert.throws(() => s.store.join(s.code, '​ \n\t'), /naam/);
