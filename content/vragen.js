@@ -71,6 +71,11 @@ module.exports = {
           tekst: 'Wat zei Daniel aan de telefoon toen hij werd gebeld met de vraag of hij al wakker was voor zijn vlucht?',
           fotos: ['ko-op-de-bank.jpg'],
         },
+        {
+          tekst:
+            'Wat is er gebeurd in de beruchte nacht van 12 december 2018, toen Daniel, Elias en Ties ' +
+            'in het tuinhuis van Daniel sliepen? Tip: het heeft te maken met ramen.',
+        },
       ],
     },
     {
