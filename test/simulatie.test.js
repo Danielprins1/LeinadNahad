@@ -1,5 +1,8 @@
 'use strict';
 
+// Tests gebruiken vaste testvragen (5 per ronde), los van content/vragen.js.
+process.env.CONTENT_FILE = require('path').join(__dirname, 'testvragen.js');
+
 /**
  * Volledige spelcyclus: 1 host + 16 gesimuleerde spelers via echte
  * Socket.IO-verbindingen tegen de echte server.

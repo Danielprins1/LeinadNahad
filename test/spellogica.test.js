@@ -1,5 +1,8 @@
 'use strict';
 
+// Tests gebruiken vaste testvragen (5 per ronde), los van content/vragen.js.
+process.env.CONTENT_FILE = require('path').join(__dirname, 'testvragen.js');
+
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { GameStore } = require('../server/game');

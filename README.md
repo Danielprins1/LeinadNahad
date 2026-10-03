@@ -3,11 +3,11 @@
 Een mobiel multiplayer-feestspel in de browser, voor maximaal 16 spelers en één aparte host (spelleider).
 Er is geen installatie en er zijn geen accounts nodig. Spelers doen mee met hun naam en een spelcode van 4 letters.
 
-Het spel heeft drie rondes van vijf vragen:
+Het spel heeft drie rondes (nu 6, 3 en 4 vragen; het aantal per ronde is vrij):
 
-1. **Psych**: open antwoorden over Daniel Dahan, daarna anoniem stemmen (1 punt per ontvangen stem).
-2. **Algemene kennis**: open antwoorden binnen 30 seconden, de host keurt goede antwoorden goed (3 punten).
-3. **Stellingen**: speel je buiten de telefoon, de host deelt punten uit (3 punten per gekozen speler).
+1. **Psych**: grappige open antwoorden over Daniel, daarna anoniem stemmen (1 punt per ontvangen stem).
+2. **Algemene kennis over Daniel**: open antwoorden binnen 30 seconden, de host keurt goede antwoorden goed (3 punten).
+3. **Hoe heeft Daniel gehandeld?**: speel je buiten de telefoon, de host deelt punten uit (3 punten per gekozen speler).
 
 ## Techniek
 
@@ -30,7 +30,7 @@ server/game.js        Spellogica: fases, rechten, timer, punten, weergave per de
 public/index.html     De enige HTML-pagina
 public/css/style.css  Vormgeving (kleuren en lettertype als variabelen bovenaan)
 public/js/app.js      Alle schermen voor spelers en host
-test/                 Geautomatiseerde tests (16 spelers + host, spellogica)
+test/                 Geautomatiseerde tests (met eigen testvragen in test/testvragen.js)
 Dockerfile, render.yaml  Hosting
 ```
 

@@ -56,7 +56,8 @@ function safeEqual(a, b) {
 
 function loadContent() {
   // Bij elk nieuw spel opnieuw inlezen, zodat aangepaste vragen meteen gelden.
-  const file = require.resolve('../content/vragen');
+  // CONTENT_FILE kan een ander vragenbestand aanwijzen (gebruikt door de tests).
+  const file = require.resolve(process.env.CONTENT_FILE || '../content/vragen');
   delete require.cache[file];
   const rondes = require(file).rondes;
   if (!Array.isArray(rondes) || rondes.length !== 3) fail('content/vragen.js moet precies drie rondes bevatten.');

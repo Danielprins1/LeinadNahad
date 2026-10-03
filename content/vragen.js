@@ -4,7 +4,7 @@
  * Je kunt de teksten hieronder vrij aanpassen, toevoegen of verwijderen
  * zonder de spellogica te wijzigen. Let op:
  *  - Houd de volgorde van de drie rondes aan (Psych, Algemene kennis, Stellingen).
- *  - Iedere ronde heeft minimaal één vraag/stelling nodig (bedoeld: vijf).
+ *  - Iedere ronde heeft minimaal één vraag/stelling nodig; het aantal per ronde mag verschillen.
  *  - Zet iedere tekst tussen enkele aanhalingstekens en sluit af met een komma.
  *    Gebruik je zelf een apostrof in de tekst? Schrijf dan \' (bijv. 'Daniel\'s auto').
  *  - Wijzigingen gelden voor ieder spel dat daarna wordt aangemaakt (of via
@@ -16,41 +16,45 @@ module.exports = {
     {
       titel: 'Psych',
       uitleg:
-        'Schrijf een grappig of geloofwaardig antwoord over Daniel Dahan. ' +
+        'Schrijf het grappigste antwoord over Daniel. ' +
         'Daarna stemt iedereen op zijn favoriete antwoord. Iedere stem op jouw antwoord levert 1 punt op.',
       vragen: [
-        'Wat zou Daniel Dahan als eerste doen als hij een miljoen euro won?',
-        'Wat is de grootste geheime angst van Daniel Dahan?',
-        'Welk liedje zingt Daniel Dahan stiekem onder de douche?',
-        'Wat zou de titel zijn van de autobiografie van Daniel Dahan?',
-        'Waarvoor zou Daniel Dahan een prijs winnen?',
+        // Foto van Isa volgt in een latere versie.
+        'Daniel heeft Isa geil gemaakt door één zin te zeggen. Welke zin was dat?',
+        'Waarom is Daniel te laat bij zijn sollicitatie, en hoe fixt hij de job?',
+        'Daniel zit bij de EHBO. Wat is er gebeurd?',
+        'Daniel gaat op vakantie. Wat zit er in zijn tas?',
+        'Daniel ziet een vrouw. Wat doet hij?',
+        'Daniel belt je om 2 uur ’s nachts. Waarom belt hij?',
       ],
     },
     {
-      titel: 'Algemene kennis',
+      titel: 'Algemene kennis over Daniel',
       uitleg:
-        'Je hebt 30 seconden om de vraag te beantwoorden. De host beoordeelt de antwoorden. ' +
-        'Ieder goed antwoord levert 3 punten op.',
+        'Hoe goed ken jij Daniel? Je hebt 30 seconden om de vraag te beantwoorden. ' +
+        'De host beoordeelt de antwoorden. Ieder goed antwoord levert 3 punten op.',
       tijdslimietSeconden: 30,
       vragen: [
-        'Wat is de hoofdstad van Australië?',
-        'Hoeveel poten heeft een spin?',
-        'In welk jaar viel de Berlijnse Muur?',
-        'Welk element heeft het scheikundige symbool O?',
-        'Wie schilderde de Nachtwacht?',
+        'Wat is de lengte van Daniels hoofd?',
+        'Daniel is voorzitter bij de Joodse jeugdbeweging Haboniem. Op de algemene ledenvergadering voor de begeleiders ' +
+          'wordt besproken wanneer er gescholden mag worden in het bijzijn van de oudste kinderen. ' +
+          'Welk woord verdedigt Daniel, en waarom?',
+        'Wat zei Daniel aan de telefoon toen hij werd gebeld met de vraag of hij al wakker was voor zijn vlucht?',
       ],
     },
     {
-      titel: 'Stellingen',
+      titel: 'Hoe heeft Daniel gehandeld?',
       uitleg:
-        'Deze ronde speel je buiten de telefoon. Lees de stelling en voer de opdracht samen uit. ' +
-        'De host deelt per stelling 3 punten uit aan de winnaars.',
+        'Lees de situatie voor en bespreek samen hoe Daniel heeft gehandeld. ' +
+        'De host deelt per situatie 3 punten uit aan de spelers die het (bijna) goed hadden.',
       stellingen: [
-        'Wie het langst op één been kan staan, wint.',
-        'De speler die het beste Daniel Dahan kan nadoen, wint.',
-        'Wie als eerste iets roods kan laten zien, wint.',
-        'Wie het beste verhaal over Daniel Dahan vertelt, wint.',
-        'Wie het hardst kan lachen zonder geluid te maken, wint.',
+        'Daniel filmt zichzelf en er staat een Chinese vrouw (Meiling) achter hem. Wat gebeurt er daarna?',
+        'In een leegstaand kantoorgebouw gooit Daniel shit van het dak. Hij knipt een zware deur uit de scharnieren ' +
+          'en gooit die ook van het dak. De deur valt op zijn fiets, die helemaal plat is. ' +
+          'Wat heeft hij tegen zijn ouders gezegd?',
+        'Daniel viert zijn verjaardag bij Yesher thuis en ziet een bank. Wat wilde hij doen, en wat was de aftermath?',
+        'Daniel is op Thuishaven en ziet een leuke dame staan, binnen in de Loods. Hij gaat met haar kletsen, ' +
+          'maar voelt iets in zijn buik borrelen. Wat doet hij?',
       ],
     },
   ],
