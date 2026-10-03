@@ -29,13 +29,22 @@ module.exports = {
           tekst: 'Waarom is Daniel te laat bij zijn sollicitatie, en hoe fixt hij de job?',
           fotos: ['outfit.jpg'],
         },
-        'Daniel zit bij de EHBO. Wat is er gebeurd?',
+        {
+          tekst: 'Daniel zit bij de EHBO. Wat is er gebeurd?',
+          fotos: ['ehbo-vest.jpg'],
+        },
         {
           tekst: 'Daniel gaat op vakantie. Wat zit er in zijn tas?',
           fotos: ['aubergine.jpg'],
         },
-        'Daniel ziet een vrouw. Wat doet hij?',
-        'Daniel belt je om 2 uur ’s nachts. Waarom belt hij?',
+        {
+          tekst: 'Daniel ziet een vrouw. Wat doet hij?',
+          fotos: ['schouder.jpg'],
+        },
+        {
+          tekst: 'Daniel belt je om 2 uur ’s nachts. Waarom belt hij?',
+          fotos: ['slapen.jpg'],
+        },
       ],
     },
     {
@@ -66,15 +75,23 @@ module.exports = {
         'De host deelt per situatie 3 punten uit aan de spelers die het (bijna) goed hadden.',
       stellingen: [
         'Daniel filmt zichzelf en er staat een Chinese vrouw (Meiling) achter hem. Wat gebeurt er daarna?',
-        'In een leegstaand kantoorgebouw gooit Daniel shit van het dak. Hij knipt een zware deur uit de scharnieren ' +
-          'en gooit die ook van het dak. De deur valt op zijn fiets, die helemaal plat is. ' +
-          'Wat heeft hij tegen zijn ouders gezegd?',
+        {
+          tekst:
+            'In een leegstaand kantoorgebouw gooit Daniel shit van het dak. Hij knipt een zware deur uit de scharnieren ' +
+            'en gooit die ook van het dak. De deur valt op zijn fiets, die helemaal plat is. ' +
+            'Wat heeft hij tegen zijn ouders gezegd?',
+          fotos: ['tunnel.jpg'],
+        },
         {
           tekst: 'Daniel viert zijn verjaardag bij Yesher thuis en ziet een bank. Wat wilde hij doen, en wat was de aftermath?',
           fotos: ['handdruk.jpg'],
         },
-        'Daniel is op Thuishaven en ziet een leuke dame staan, binnen in de Loods. Hij gaat met haar kletsen, ' +
-          'maar voelt iets in zijn buik borrelen. Wat doet hij?',
+        {
+          tekst:
+            'Daniel is op Thuishaven en ziet een leuke dame staan, binnen in de Loods. Hij gaat met haar kletsen, ' +
+            'maar voelt iets in zijn buik borrelen. Wat doet hij?',
+          fotos: ['etentje.jpg'],
+        },
       ],
     },
   ],
