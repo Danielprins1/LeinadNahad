@@ -25,9 +25,15 @@ module.exports = {
           tekst: 'Daniel heeft Isa geil gemaakt door één zin te zeggen. Welke zin was dat?',
           fotos: ['isa-1.jpg', 'isa-2.jpg'],
         },
-        'Waarom is Daniel te laat bij zijn sollicitatie, en hoe fixt hij de job?',
+        {
+          tekst: 'Waarom is Daniel te laat bij zijn sollicitatie, en hoe fixt hij de job?',
+          fotos: ['outfit.jpg'],
+        },
         'Daniel zit bij de EHBO. Wat is er gebeurd?',
-        'Daniel gaat op vakantie. Wat zit er in zijn tas?',
+        {
+          tekst: 'Daniel gaat op vakantie. Wat zit er in zijn tas?',
+          fotos: ['aubergine.jpg'],
+        },
         'Daniel ziet een vrouw. Wat doet hij?',
         'Daniel belt je om 2 uur ’s nachts. Waarom belt hij?',
       ],
@@ -45,9 +51,12 @@ module.exports = {
             'Daniel is voorzitter bij de Joodse jeugdbeweging Haboniem. Op de algemene ledenvergadering voor de begeleiders ' +
             'wordt besproken wanneer er gescholden mag worden in het bijzijn van de oudste kinderen. ' +
             'Welk woord verdedigt Daniel, en waarom?',
-          fotos: ['daniel-haboniem.webp'],
+          fotos: ['daniel-haboniem.webp', 'haboniem-groep.jpg'],
         },
-        'Wat zei Daniel aan de telefoon toen hij werd gebeld met de vraag of hij al wakker was voor zijn vlucht?',
+        {
+          tekst: 'Wat zei Daniel aan de telefoon toen hij werd gebeld met de vraag of hij al wakker was voor zijn vlucht?',
+          fotos: ['ko-op-de-bank.jpg'],
+        },
       ],
     },
     {
@@ -60,7 +69,10 @@ module.exports = {
         'In een leegstaand kantoorgebouw gooit Daniel shit van het dak. Hij knipt een zware deur uit de scharnieren ' +
           'en gooit die ook van het dak. De deur valt op zijn fiets, die helemaal plat is. ' +
           'Wat heeft hij tegen zijn ouders gezegd?',
-        'Daniel viert zijn verjaardag bij Yesher thuis en ziet een bank. Wat wilde hij doen, en wat was de aftermath?',
+        {
+          tekst: 'Daniel viert zijn verjaardag bij Yesher thuis en ziet een bank. Wat wilde hij doen, en wat was de aftermath?',
+          fotos: ['handdruk.jpg'],
+        },
         'Daniel is op Thuishaven en ziet een leuke dame staan, binnen in de Loods. Hij gaat met haar kletsen, ' +
           'maar voelt iets in zijn buik borrelen. Wat doet hij?',
       ],

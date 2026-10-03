@@ -361,8 +361,8 @@
     if (v.phase === 'intro') return banner(`Ronde ${v.round} van ${v.totalRounds}`, v.roundTitle, null, true);
     return [
       banner(v.roundTitle, v.question, `Ronde ${v.round} · ${itemWoord(v)} ${v.qIndex} van ${v.totalQ}`, v.roundType === 'stellingen'),
-      // groot tijdens het antwoorden, daarna als miniaturen
-      fotos(v.questionImages, v.phase !== 'answer'),
+      // groot tijdens het antwoorden en bij situaties, daarna als miniaturen
+      fotos(v.questionImages, !['answer', 'statement'].includes(v.phase)),
     ];
   }
 
