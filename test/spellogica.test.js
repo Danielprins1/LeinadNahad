@@ -106,6 +106,29 @@ test('verouderde stap of dubbele bevestiging kent nooit dubbel punten toe', () =
   assert.deepEqual(s.game.players[1].scores, [0, 0, 0]);
 });
 
+test('psych: hetzelfde antwoord als een ander wordt geweigerd, in ronde 2 mag het wel', () => {
+  const s = opzet(4);
+  s.host('start');
+  s.host('next');
+  s.speler(0, 'answer', { text: 'Een jacht kopen!' });
+  for (const variant of ['een jacht kopen', 'EEN  JACHT KOPEN', 'Eén jacht-kopen?']) {
+    assert.throws(() => s.speler(1, 'answer', { text: variant }), /al ingestuurd/);
+  }
+  assert.equal(Object.keys(s.game.q.answers).length, 1);
+  s.speler(1, 'answer', { text: 'Twee jachten kopen' });
+  assert.equal(Object.keys(s.game.q.answers).length, 2);
+
+  // Door naar ronde 2: daar mag iedereen hetzelfde antwoord geven.
+  while (!(s.game.phase === 'answer' && s.store.round(s.game).type === 'kennis')) {
+    if (s.game.phase === 'answer') s.host('closeAnswers');
+    else if (s.game.phase === 'vote') s.host('closeVotes');
+    else s.host('next');
+  }
+  s.speler(0, 'answer', { text: 'Canberra' });
+  assert.doesNotThrow(() => s.speler(1, 'answer', { text: 'canberra' }));
+  s.done();
+});
+
 test('lange en rare invoer wordt opgeschoond', () => {
   const s = opzet(1);
   assert.throws(() => s.store.join(s.code, '​ \n\t'), /naam/);

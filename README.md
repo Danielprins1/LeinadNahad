@@ -113,6 +113,8 @@ Beide kunnen de meegeleverde `Dockerfile` gebruiken. Zorg dat je één instantie
 - **Opnieuw verbinden**: de identiteit van spelers en host wordt in de browser bewaard (geheim token). Na verversen of
   bij tijdelijk wegvallen kom je terug als dezelfde deelnemer, met dezelfde voortgang. Is het tabblad gesloten, dan toont
   het startscherm de knop *Terug naar het spel*.
+- **Unieke antwoorden in Psych**: een antwoord dat (op hoofdletters, accenten, leestekens en spaties na) al door
+  iemand anders is ingestuurd, wordt geweigerd met de vraag iets nieuws te bedenken. In ronde 2 mag het wel.
 - **Nooit dubbele punten**: iedere hostactie hoort bij een vaste spelstap. Een dubbelklik of verouderd scherm wordt
   geweigerd met "Deze actie is al verwerkt". Punten worden per vraag precies één keer toegekend.
 - **Wegvallende spelers**: in ronde 1 kan de host de antwoord- en stemfase eerder afsluiten. Ronde 2 sluit vanzelf op de

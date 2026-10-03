@@ -47,6 +47,14 @@ function cleanText(value, max) {
 
 const nameKey = (name) => name.toLocaleLowerCase('nl-NL');
 
+// Vergelijkingssleutel voor antwoorden: zonder hoofdletters, accenten, leestekens en spaties.
+const answerKey = (text) =>
+  text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLocaleLowerCase('nl-NL')
+    .replace(/[^\p{L}\p{N}]/gu, '');
+
 function safeEqual(a, b) {
   if (typeof a !== 'string' || typeof b !== 'string') return false;
   const ba = Buffer.from(a);
@@ -550,6 +558,13 @@ const PLAYER_ACTIONS = {
     if (player.id in game.q.answers) fail('Je hebt al een antwoord ingestuurd.');
     const clean = cleanText(text, ANSWER_MAX);
     if (!clean) fail('Een leeg antwoord kan niet worden ingestuurd.');
+    // In Psych moet ieder antwoord uniek zijn (in ronde 2 mogen meerdere spelers hetzelfde goede antwoord geven).
+    if (this.round(game).type === 'psych') {
+      const key = answerKey(clean);
+      if (key && Object.values(game.q.answers).some((a) => answerKey(a) === key)) {
+        fail('Iemand heeft dit antwoord al ingestuurd. Bedenk iets nieuws!');
+      }
+    }
     game.q.answers[player.id] = clean;
     if (game.players.every((p) => p.id in game.q.answers)) this.closeAnswers(game);
     this.changed(game);

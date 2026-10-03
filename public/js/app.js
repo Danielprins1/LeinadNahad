@@ -110,7 +110,7 @@
   }
 
   // Voert een actie uit met een knop die tijdens het versturen geblokkeerd is.
-  async function actie(knop, type, extra = {}, bezigTekst) {
+  async function actie(knop, type, extra = {}, bezigTekst, { stil = false } = {}) {
     if (knop && knop.disabled) return { ok: false };
     const oud = knop ? knop.textContent : '';
     if (knop) {
@@ -119,7 +119,7 @@
     }
     const res = await verzend('action', { type, step: view ? view.step : -1, ...extra });
     if (!res.ok) {
-      melding(res.error, 'fout');
+      if (!stil) melding(res.error, 'fout');
       if (knop && knop.isConnected) {
         knop.disabled = false;
         knop.textContent = oud;
@@ -767,8 +767,14 @@
               return;
             }
             veld.blur();
-            const res = await actie(knop, 'answer', { text: tekst }, 'Versturen…');
+            const res = await actie(knop, 'answer', { text: tekst }, 'Versturen…', { stil: true });
             if (res.ok) confetti.vanaf(knop, 40);
+            else if (res.error) {
+              // Fout direct bij het tekstveld tonen (bijv. dubbel antwoord); tekst blijft staan.
+              foutVak.textContent = res.error;
+              foutVak.hidden = false;
+              if (veld.isConnected && !veld.disabled) veld.focus();
+            }
           },
         },
         h('label', { for: 'antwoord', class: 'sectie' }, 'Jouw antwoord'),
