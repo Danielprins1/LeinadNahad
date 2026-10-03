@@ -53,7 +53,8 @@ module.exports = {
       titel: 'Algemene kennis over Daniel',
       uitleg:
         'Hoe goed ken jij Daniel? Je hebt 30 seconden om de vraag te beantwoorden. ' +
-        'De host beoordeelt de antwoorden. Ieder goed antwoord levert 3 punten op.',
+        'De host beoordeelt de antwoorden. Ieder goed antwoord levert 3 punten op. ' +
+        'De laatste vraag is een uitbeeldvraag: daar deelt de host de punten uit.',
       tijdslimietSeconden: 30,
       vragen: [
         {
@@ -71,10 +72,16 @@ module.exports = {
           tekst: 'Wat zei Daniel aan de telefoon toen hij werd gebeld met de vraag of hij al wakker was voor zijn vlucht?',
           fotos: ['ko-op-de-bank.jpg'],
         },
+        'Wat gebeurde er tijdens de eerste SO ooit op de middelbare school van Daniel?',
+        'Maak de zin van Daniel af: “Ik haat …”',
         {
           tekst:
             'Wat is er gebeurd in de beruchte nacht van 12 december 2018, toen Daniel, Elias en Ties ' +
             'in het tuinhuis van Daniel sliepen? Tip: het heeft te maken met ramen.',
+        },
+        {
+          tekst: 'Wat is Daniels standaard dansje als hij in zijn blote bast is? Doe het om de beurt voor!',
+          uitbeelden: true,
         },
       ],
     },
@@ -85,7 +92,7 @@ module.exports = {
         'De host deelt per situatie 3 punten uit aan de spelers die het (bijna) goed hadden.',
       stellingen: [
         {
-          tekst: 'Daniel filmt zichzelf en er staat een Chinese vrouw (Meiling) achter hem. Wat gebeurt er daarna?',
+          tekst: 'Daniel filmt zichzelf en er staat een Chinees voor hem. Wat gebeurt er daarna?',
           fotos: ['klas.jpg'],
         },
         {
