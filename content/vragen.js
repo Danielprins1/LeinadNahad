@@ -23,7 +23,7 @@ module.exports = {
       vragen: [
         {
           tekst: 'Daniel heeft Isa geil gemaakt door één zin te zeggen. Welke zin was dat?',
-          fotos: ['isa-1.jpg', 'isa-2.jpg'],
+          fotos: ['isa-1.webp', 'isa-2.webp'],
         },
         {
           tekst: 'Waarom is Daniel te laat bij zijn sollicitatie, en hoe fixt hij de job?',

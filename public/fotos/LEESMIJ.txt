@@ -1,5 +1,5 @@
 Zet hier de foto's die bij vragen horen (jpg, png, webp of gif).
 Koppel ze aan een vraag in content/vragen.js met:  { tekst: '...', fotos: ['naam.jpg'] }
 
-Verwacht voor ronde 1, vraag 1:  isa-1.jpg  en  isa-2.jpg
+Ronde 1, vraag 1 gebruikt:  isa-1.webp  en  isa-2.webp
 Ontbreekt een foto, dan wordt hij gewoon niet getoond.

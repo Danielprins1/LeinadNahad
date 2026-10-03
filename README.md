@@ -45,7 +45,7 @@ volstaat bij Render).
 ### Foto's bij een vraag
 
 Zet de foto in `public/fotos/` en schrijf de vraag in `content/vragen.js` als
-`{ tekst: 'De vraag', fotos: ['naam.jpg'] }`. Vraag 1 van ronde 1 verwacht `isa-1.jpg` en `isa-2.jpg`.
+`{ tekst: 'De vraag', fotos: ['naam.jpg'] }`. Vraag 1 van ronde 1 gebruikt `isa-1.webp` en `isa-2.webp`.
 Ontbreekt een foto, dan wordt die gewoon niet getoond. Spelers kunnen op een foto tikken om hem te vergroten.
 
 ## Lokaal starten
