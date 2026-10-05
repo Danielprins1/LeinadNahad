@@ -1,5 +1,8 @@
 # The Ferbiël Games – Daniel 21 jaar
 
+> **Nieuw:** in de map [`nepantwoord/`](nepantwoord/README.md) staat een losstaande Next.js + Supabase-app:
+> een realtime partyspel (max. 30 spelers) waarin je nepantwoorden verzint en het echte antwoord raadt.
+
 Een mobiel multiplayer-feestspel in de browser, voor maximaal 16 spelers en één aparte host (spelleider).
 Er is geen installatie en er zijn geen accounts nodig. Spelers doen mee met hun naam en een spelcode van 4 letters.
 
