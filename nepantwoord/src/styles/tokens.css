@@ -1,0 +1,85 @@
+/*
+ * DESIGN TOKENS
+ * ------------------------------------------------------------------
+ * Alle kleuren, lettertypes, afrondingen en afstanden staan hier.
+ * Pas deze waarden aan om de hele app een andere stijl te geven.
+ * De componenten (components.css) gebruiken uitsluitend deze variabelen.
+ */
+:root {
+  /* Kleuren */
+  --color-bg: #f4f5f7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #eef0f3;
+  --color-text: #1b1d21;
+  --color-text-muted: #5f6672;
+  --color-border: #d7dbe1;
+
+  --color-primary: #2f5bea;
+  --color-primary-hover: #2449c4;
+  --color-primary-contrast: #ffffff;
+
+  --color-secondary: #e3e7ee;
+  --color-secondary-hover: #d5dae3;
+  --color-secondary-contrast: #1b1d21;
+
+  --color-danger: #c62f2f;
+  --color-danger-contrast: #ffffff;
+
+  --color-success: #1d8a4a;
+  --color-success-bg: #e5f5ea;
+  --color-error: #b42318;
+  --color-error-bg: #fdecea;
+  --color-info-bg: #e8eefc;
+
+  --color-correct: #1d8a4a;
+  --color-correct-bg: #e5f5ea;
+  --color-selected: #2f5bea;
+  --color-disabled-bg: #eceef1;
+  --color-disabled-text: #8a919c;
+
+  --color-online: #1d8a4a;
+  --color-offline: #b6bcc6;
+
+  /* Typografie */
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-heading: var(--font-body);
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.625rem;
+  --text-2xl: 2.125rem;
+  --text-3xl: 3rem;
+  --text-code: clamp(3rem, 12vw, 6rem);
+
+  --weight-normal: 400;
+  --weight-bold: 700;
+  --line-height: 1.45;
+  --letter-spacing-caps: 0.06em;
+
+  /* Afronding */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 999px;
+
+  /* Afstanden */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Overig */
+  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  --focus-ring: 0 0 0 3px rgba(47, 91, 234, 0.35);
+  --button-height: 56px;
+  --input-height: 52px;
+  --width-player: 560px;
+  --width-host: 1100px;
+  --transition: 120ms ease;
+}
